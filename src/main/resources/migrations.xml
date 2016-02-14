@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="1" author="franco">
+        <createTable tableName="shows">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="language" type="varchar(2)"/>
+            <column name="series_name" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="banner" type="varchar(255)"/>
+            <column name="overview" type="varchar(500)"/>
+            <column name="first_arired" type="date"/>
+            <column name="network" type="varchar(5)"/>
+            <column name="imdb_id" type="varchar(20)"/>
+            <column name="zap2it_id" type="varchar(20)"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="2" author="franco">
+        <addColumn tableName="shows">
+            <column name="external_id" type="bigint"/>
+        </addColumn>
+    </changeSet>
+    <changeSet id="3" author="franco">
+        <createTable tableName="episodes">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="season_number" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="episode_number" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="episode_name" type="varchar(100)"/>
+            <column name="overview" type="varchar(500)"/>
+            <column name="filename" type="varchar(100)"/>
+            <column name="season_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="series_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet id="4" author="franco">
+        <addColumn tableName="episodes">
+            <column name="seen" type="boolean" defaultValue="false"/>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>
