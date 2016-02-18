@@ -60,18 +60,6 @@ public class ShowResource {
         return new ShowApi(showDB, episodesDB);
     }
 
-    @GET
-    @Path("/search")
-    @Timed
-    public List<SearchApi> search(@QueryParam("showName") com.google.common.base.Optional<String> showName) {
-        SearchEntity search = TvDbApi.getInstance().getSeries(showName.or(""));
-
-        return search.getData()
-                .stream()
-                .map((show) -> new SearchApi(show.getImdbId(), show.getSeriesName()))
-                .collect(Collectors.toList());
-    }
-
     @POST
     @Path("/{imdbId}/updateSeason")
     @Timed
@@ -93,6 +81,18 @@ public class ShowResource {
         this.showDAO.delete(show);
 
         return true;
+    }
+
+    @GET
+    @Path("/search")
+    @Timed
+    public List<SearchApi> search(@QueryParam("showName") com.google.common.base.Optional<String> showName) {
+        SearchEntity search = TvDbApi.getInstance().getSeries(showName.or(""));
+
+        return search.getData()
+                .stream()
+                .map((show) -> new SearchApi(show.getImdbId(), show.getSeriesName()))
+                .collect(Collectors.toList());
     }
 
     private List getOrAddShow(String show) {

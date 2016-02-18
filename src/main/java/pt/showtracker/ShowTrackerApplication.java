@@ -12,6 +12,7 @@ import pt.showtracker.core.Episode;
 import pt.showtracker.core.Show;
 import pt.showtracker.jdbi.EpisodeDAO;
 import pt.showtracker.jdbi.ShowDAO;
+import pt.showtracker.resources.EpisodeResource;
 import pt.showtracker.resources.ShowResource;
 import pt.showtracker.task.DownloadEpisodesTask;
 import pt.showtracker.task.TaskDispatcher;
@@ -68,6 +69,7 @@ public class ShowTrackerApplication extends Application<ShowTrackerConfiguration
         final EpisodeDAO episodeDAO = new EpisodeDAO(hibernate.getSessionFactory());
         final ShowDAO showDAO = new ShowDAO(hibernate.getSessionFactory());
         environment.jersey().register(new ShowResource(showDAO, episodeDAO));
+        environment.jersey().register(new EpisodeResource(episodeDAO));
 
         // tasks
         environment.admin().addTask(new DownloadEpisodesTask(episodeDAO, hibernate.getSessionFactory()));

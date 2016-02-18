@@ -55,4 +55,10 @@
             <column name="seen" type="boolean" defaultValue="false"/>
         </addColumn>
     </changeSet>
+    <changeSet id="5" author="franco">
+        <modifyDataType columnName="episode_name"
+                        newDataType="varchar(200)"
+                        schemaName="public"
+                        tableName="episodes"/>
+    </changeSet>
 </databaseChangeLog>
