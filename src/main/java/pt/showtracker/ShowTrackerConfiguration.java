@@ -61,37 +61,4 @@ public class ShowTrackerConfiguration extends Configuration {
         return apiKey;
     }
 
-    /**
-     * The host.
-     */
-    @NotEmpty
-    private String host;
-
-
-    /**
-     * A getter for the host.
-     *
-     * @return the hostname.
-     */
-    @JsonProperty
-    public String getHost() {
-        return host;
-    }
-
-    /**
-     * The port.
-     */
-    @NotNull
-    private String port;
-
-
-    /**
-     * A getter for the port.
-     *
-     * @return the port.
-     */
-    @JsonProperty
-    public String getPort() {
-        return port;
-    }
 }

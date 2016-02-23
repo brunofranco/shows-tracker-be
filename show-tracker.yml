@@ -31,9 +31,3 @@ database:
 
 # TvDb apikey
 apiKey: 9DA7BCE1984877BE
-
-# host
-host: localhost
-
-# port
-port: 9001

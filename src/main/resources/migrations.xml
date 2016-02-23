@@ -61,4 +61,16 @@
                         schemaName="public"
                         tableName="episodes"/>
     </changeSet>
+    <changeSet id="6" author="franco">
+        <modifyDataType columnName="overview"
+                        newDataType="text"
+                        schemaName="public"
+                        tableName="episodes"/>
+    </changeSet>
+    <changeSet id="7" author="franco">
+        <modifyDataType columnName="overview"
+                        newDataType="text"
+                        schemaName="public"
+                        tableName="shows"/>
+    </changeSet>
 </databaseChangeLog>

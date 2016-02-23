@@ -16,8 +16,8 @@ public class EpisodeDAO extends AbstractDAO<Episode> {
         super(factory);
     }
 
-    public long create(Episode episode) {
-        return persist(episode).getId();
+    public Episode create(Episode episode) {
+        return persist(episode);
     }
 
     public List<Episode> bySeriesId(long externalId) {

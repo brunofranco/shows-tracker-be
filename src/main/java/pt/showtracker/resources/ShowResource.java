@@ -9,14 +9,17 @@ import pt.showtracker.core.Episode;
 import pt.showtracker.core.Show;
 import pt.showtracker.jdbi.EpisodeDAO;
 import pt.showtracker.jdbi.ShowDAO;
-import pt.showtracker.task.TaskDispatcher;
+import pt.showtracker.task.DownloadEpisodesTask;
 import pt.showtracker.tvDb.TvDbApi;
 import pt.showtracker.tvDb.entity.SearchEntity;
 import pt.showtracker.tvDb.entity.ShowEntity;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBException;
+import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -53,11 +56,19 @@ public class ShowResource {
     @UnitOfWork
     public ShowApi show(@PathParam("imdbId") String imdbId) {
 
-        List entities = getOrAddShow(imdbId);
-        Show showDB = (Show) entities.get(0);
-        List<Episode> episodesDB = (List<Episode>) entities.get(1);
 
-        return new ShowApi(showDB, episodesDB);
+        List entities = null;
+        try {
+            entities = getOrAddShow(imdbId);
+            Show showDB = (Show) entities.get(0);
+            List<Episode> episodesDB = (List<Episode>) entities.get(1);
+
+            return new ShowApi(showDB, episodesDB);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ShowApi();
+        }
+
     }
 
     @POST
@@ -89,13 +100,16 @@ public class ShowResource {
     public List<SearchApi> search(@QueryParam("showName") com.google.common.base.Optional<String> showName) {
         SearchEntity search = TvDbApi.getInstance().getSeries(showName.or(""));
 
+        if (search.getData().isEmpty())
+            return Collections.emptyList();
+
         return search.getData()
                 .stream()
                 .map((show) -> new SearchApi(show.getImdbId(), show.getSeriesName()))
                 .collect(Collectors.toList());
     }
 
-    private List getOrAddShow(String show) {
+    private List getOrAddShow(String show) throws IOException, JAXBException {
         Show showDB = this.showDAO.findByImdbId(show);
         if(showDB == null) {
             ShowEntity series = TvDbApi.getInstance().getShow(show);
@@ -109,8 +123,8 @@ public class ShowResource {
 
         List<Episode> episodesDB = this.episodeDAO.bySeriesId(showDB.getExternalId());
         if(episodesDB.isEmpty()) {
-            TaskDispatcher.getInstance().scheduleTask("downloadEpisodes", showDB.getExternalId());
-            episodesDB = this.episodeDAO.bySeriesId(showDB.getExternalId());
+//            TaskDispatcher.getInstance().scheduleTask("downloadEpisodes", showDB.getExternalId());
+            episodesDB = DownloadEpisodesTask.getInstance().execute(showDB.getExternalId());
         }
 
         return Arrays.asList(showDB, episodesDB);

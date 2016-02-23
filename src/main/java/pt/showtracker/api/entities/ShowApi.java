@@ -51,6 +51,9 @@ public class ShowApi {
         this.episodes = episodesDB;
     }
 
+    public ShowApi() {
+    }
+
     @JsonProperty
     public long getSeriesId() {
         return seriesId.orElse(0L);

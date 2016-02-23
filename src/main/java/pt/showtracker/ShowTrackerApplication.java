@@ -15,7 +15,6 @@ import pt.showtracker.jdbi.ShowDAO;
 import pt.showtracker.resources.EpisodeResource;
 import pt.showtracker.resources.ShowResource;
 import pt.showtracker.task.DownloadEpisodesTask;
-import pt.showtracker.task.TaskDispatcher;
 import pt.showtracker.tvDb.TvDbApi;
 
 import javax.servlet.DispatcherType;
@@ -58,8 +57,6 @@ public class ShowTrackerApplication extends Application<ShowTrackerConfiguration
 
         setCORS(environment);
 
-        TaskDispatcher.create(configuration.getHost(), configuration.getPort());
-
         //Create Jersey client
         final Client client = new JerseyClientBuilder(environment).using(configuration.getJerseyClientConfiguration()).build(getName());
         TvDbApi.create(client, configuration.getApiKey());
@@ -72,7 +69,7 @@ public class ShowTrackerApplication extends Application<ShowTrackerConfiguration
         environment.jersey().register(new EpisodeResource(episodeDAO));
 
         // tasks
-        environment.admin().addTask(new DownloadEpisodesTask(episodeDAO, hibernate.getSessionFactory()));
+        environment.admin().addTask(DownloadEpisodesTask.create(episodeDAO, hibernate.getSessionFactory()));
     }
 
     private void setCORS(Environment environment) {
