@@ -73,4 +73,9 @@
                         schemaName="public"
                         tableName="shows"/>
     </changeSet>
+    <changeSet id="8" author="franco">
+        <addColumn tableName="episodes">
+            <column name="external_id" type="int"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

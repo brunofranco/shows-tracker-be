@@ -2,10 +2,7 @@ package pt.showtracker.task;
 
 import com.google.common.collect.ImmutableMultimap;
 import io.dropwizard.servlets.tasks.Task;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.hibernate.context.internal.ManagedSessionContext;
 import pt.showtracker.core.Episode;
 import pt.showtracker.jdbi.EpisodeDAO;
 import pt.showtracker.tvDb.TvDbApi;
@@ -25,15 +22,15 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class DownloadEpisodesTask extends Task {
+public class UpdateEpisodesTask extends Task {
 
     private String address;
     private final EpisodeDAO episodeDAO;
     private final SessionFactory sessionFactory;
-    static private DownloadEpisodesTask instance = null;
+    static private UpdateEpisodesTask instance = null;
 
-    private DownloadEpisodesTask(EpisodeDAO episodeDAO, SessionFactory sessionFactory) {
-        super("downloadEpisodes");
+    private UpdateEpisodesTask(EpisodeDAO episodeDAO, SessionFactory sessionFactory) {
+        super("updateEpisodes");
         this.episodeDAO = episodeDAO;
         this.sessionFactory = sessionFactory;
         this.address = TvDbApi.getInstance().getGET_EPISODES();
@@ -41,10 +38,10 @@ public class DownloadEpisodesTask extends Task {
     }
 
     public static Task create(EpisodeDAO episodeDAO, SessionFactory sessionFactory) {
-        return new DownloadEpisodesTask(episodeDAO, sessionFactory);
+        return new UpdateEpisodesTask(episodeDAO, sessionFactory);
     }
 
-    public static DownloadEpisodesTask getInstance() {
+    public static UpdateEpisodesTask getInstance() {
         return instance;
     }
 
@@ -88,46 +85,46 @@ public class DownloadEpisodesTask extends Task {
     @Override
     public void execute(ImmutableMultimap<String, String> immutableMultimap, PrintWriter printWriter) throws Exception {
 
-        String showAddress = this.address.replace("SERIES_ID", immutableMultimap.get("id").asList().get(0));
+        String showAddress = address.replace("SERIES_ID",  String.valueOf(immutableMultimap.get("id").asList().get(0)));
         System.out.println(showAddress);
         String episodes = getEpisodes(showAddress);
         StringReader s = new StringReader(episodes);
         EpisodesEntity eps = (EpisodesEntity) JAXBContext.newInstance(EpisodesEntity.class).createUnmarshaller().unmarshal(s);
 
-        //unitOfWork for tasks
-        Session session = sessionFactory.openSession();
-        try {
-            ManagedSessionContext.bind(session);
-            Transaction transaction = session.beginTransaction();
-            try {
+        // sorted by newest
+        List<EpisodeEntity> episodesList = eps.getEpisodes()
+                .stream()
+                .sorted((e1, e2) -> Long.compare(e1.getId(), e2.getId()))
+                .collect(Collectors.toList());
 
-                for(EpisodeEntity episode : eps.getEpisodes()) {
-                    episodeDAO.create(new Episode(episode));
-                }
-                transaction.commit();
-                System.out.println(eps.getEpisodes().get(0));
+        for(EpisodeEntity e : episodesList) {
+            if(this.episodeDAO.exists(e.getId())) {
+                break;
+            } else {
+                this.episodeDAO.create(new Episode(e));
             }
-            catch (Exception e) {
-                System.out.println(e);
-                transaction.rollback();
-                throw new RuntimeException(e);
-            }
-        } finally {
-            session.close();
-            ManagedSessionContext.unbind(sessionFactory);
         }
     }
 
-    public List<Episode> execute(long seriesId) throws IOException, JAXBException {
+    public void execute(long seriesId) throws IOException, JAXBException {
         String showAddress = address.replace("SERIES_ID", String.valueOf(seriesId));
         System.out.println(showAddress);
         String episodes = getEpisodes(showAddress);
         StringReader s = new StringReader(episodes);
         EpisodesEntity eps = (EpisodesEntity) JAXBContext.newInstance(EpisodesEntity.class).createUnmarshaller().unmarshal(s);
 
-        return eps.getEpisodes()
+        // sorted by newest
+        List<EpisodeEntity> episodesList = eps.getEpisodes()
                 .stream()
-                .map((episode) -> episodeDAO.create(new Episode(episode)))
+                .sorted((e1, e2) -> Long.compare(e1.getId(), e2.getId()))
                 .collect(Collectors.toList());
+
+        for(EpisodeEntity e : episodesList) {
+            if(this.episodeDAO.exists(e.getId())) {
+                break;
+            } else {
+                this.episodeDAO.create(new Episode(e));
+            }
+        }
     }
 }

@@ -15,6 +15,7 @@ import pt.showtracker.jdbi.ShowDAO;
 import pt.showtracker.resources.EpisodeResource;
 import pt.showtracker.resources.ShowResource;
 import pt.showtracker.task.DownloadEpisodesTask;
+import pt.showtracker.task.UpdateEpisodesTask;
 import pt.showtracker.tvDb.TvDbApi;
 
 import javax.servlet.DispatcherType;
@@ -70,6 +71,7 @@ public class ShowTrackerApplication extends Application<ShowTrackerConfiguration
 
         // tasks
         environment.admin().addTask(DownloadEpisodesTask.create(episodeDAO, hibernate.getSessionFactory()));
+        environment.admin().addTask(UpdateEpisodesTask.create(episodeDAO, hibernate.getSessionFactory()));
     }
 
     private void setCORS(Environment environment) {

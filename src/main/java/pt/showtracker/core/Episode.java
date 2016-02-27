@@ -13,6 +13,8 @@ import javax.persistence.*;
         @NamedQuery(name = "findBySeriesId", query = "select e from Episode e where e.seriesId = :seriesId"),
         @NamedQuery(name = "find", query = "select e from Episode e where e.id = :id"),
         @NamedQuery(name = "findBySeason", query = "select e from Episode e where e.seasonId = :seasonId"),
+        @NamedQuery(name = "findByExternalId", query = "select e from Episode e where e.externalId = :externalId"),
+        @NamedQuery(name = "findByFilename", query = "select e from Episode e where e.filename = :filename"),
         @NamedQuery(name = "findByShow", query = "select e from Episode e where e.seriesId = :showId")
 })
 public class Episode {
@@ -46,10 +48,14 @@ public class Episode {
     @Column(name = "seen", nullable = false, columnDefinition = "boolean default false")
     private boolean seen;
 
+    @Column(name = "external_id", nullable = true)
+    private Long externalId;
+
     public Episode() {
     }
 
     public Episode(EpisodeEntity episode) {
+        this.externalId = episode.getId();
         this.seasonNumber = episode.getSeasonNumber();
         this.episodeNumber = episode.getEpisodeNumber();
         this.episodeName = episode.getEpisodeName();
@@ -59,6 +65,14 @@ public class Episode {
         this.seasonId = episode.getSeasonId();
         this.seriesId = episode.getSeriesId();
         this.seen = false;
+    }
+
+    public Long getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(Long externalId) {
+        this.externalId = externalId;
     }
 
     public long getId() {

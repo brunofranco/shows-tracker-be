@@ -28,6 +28,22 @@ public class EpisodeDAO extends AbstractDAO<Episode> {
         return uniqueResult(namedQuery("find").setParameter("id", id));
     }
 
+    public Episode findByExternalId(long id) {
+        return uniqueResult(namedQuery("findByExternalId").setParameter("externalId", id));
+    }
+
+    public boolean existsByFilename(String filename) {
+        return !list(namedQuery("findByFilename").setParameter("filename", filename)).isEmpty();
+    }
+
+    public Episode findByFilename(String filename) {
+        return uniqueResult(namedQuery("findByFilename").setParameter("filename", filename));
+    }
+
+    public boolean exists(long id) {
+        return !list(namedQuery("find").setParameter("id", id)).isEmpty();
+    }
+
     public Episode update(Episode episode) {
         return persist(episode);
     }

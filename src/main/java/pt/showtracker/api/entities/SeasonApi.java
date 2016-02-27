@@ -3,39 +3,37 @@ package pt.showtracker.api.entities;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import pt.showtracker.core.Episode;
 
-import java.util.Optional;
-
 public class SeasonApi {
-    private Optional<Long> id;
-    private Optional<Boolean> seen;
+    private Long id;
+    private Boolean seen;
 
     public SeasonApi() {
     }
 
     public SeasonApi(Episode episodeDB) {
-        this.id = Optional.ofNullable(episodeDB.getId());
-        this.seen = Optional.ofNullable(episodeDB.isSeen());
+        this.id = episodeDB.getId();
+        this.seen = episodeDB.isSeen();
     }
 
     public SeasonApi(Long id, Boolean seen) {
-        this.id = Optional.ofNullable(id);
-        this.seen = Optional.ofNullable(seen);
+        this.id = id;
+        this.seen = seen;
     }
 
     @JsonProperty
     public Long getId() {
-        return id.orElse(0L);
+        return id;
     }
 
     public Boolean getSeen() {
-        return seen.orElse(Boolean.FALSE);
+        return seen;
     }
 
     public void setId(Long id) {
-        this.id = Optional.ofNullable(id);
+        this.id = id;
     }
 
     public void setSeen(Boolean seen) {
-        this.seen = Optional.ofNullable(seen);
+        this.seen = seen;
     }
 }

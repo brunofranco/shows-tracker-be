@@ -6,49 +6,50 @@ import pt.showtracker.core.Show;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ShowApi {
-    private Optional<Long> seriesId;
-    private Optional<String> language;
-    private Optional<String> seriesName;
-    private Optional<String> banner;
-    private Optional<String> overview;
-    private Optional<String> firstAired;
-    private Optional<String> network;
-    private Optional<String> imdbId;
-    private Optional<String> zap2itId;
-    private List<Episode> episodes;
+    private Long seriesId;
+    private String language;
+    private String seriesName;
+    private String banner;
+    private String overview;
+    private String firstAired;
+    private String network;
+    private String imdbId;
+    private String zap2itId;
+    private List<EpisodeApi> episodes;
 
     static DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
 
     public ShowApi(long seriesId, String language, String seriesName, String banner, String overview, Date firstAired, String network, String imdbId, String zap2itId, List<Episode> episodes) {
-        this.seriesId = Optional.ofNullable(seriesId);
-        this.language = Optional.ofNullable(language);
-        this.seriesName = Optional.ofNullable(seriesName);
-        this.banner = Optional.ofNullable(banner);
-        this.overview = Optional.ofNullable(overview);
-        this.firstAired = Optional.ofNullable(firstAired == null ? null: df.format(firstAired));
-        this.network = Optional.ofNullable(network);
-        this.imdbId = Optional.ofNullable(imdbId);
-        this.zap2itId = Optional.ofNullable(zap2itId);
-        this.episodes = episodes;
+        this.seriesId = seriesId;
+        this.language = language;
+        this.seriesName = seriesName;
+        this.banner = banner;
+        this.overview = overview;
+        this.firstAired = firstAired == null ? null: df.format(firstAired);
+        this.network = network;
+        this.imdbId = imdbId;
+        this.zap2itId = zap2itId;
+        this.episodes = episodes == null ? Collections.EMPTY_LIST : episodes.stream().map((e) -> new EpisodeApi(e)).collect(Collectors.toList());
     }
 
-    public ShowApi(Show showDB, List<Episode> episodesDB) {
-        this.seriesId = Optional.ofNullable(showDB.getExternalId());
-        this.language = Optional.ofNullable(showDB.getLanguage());
-        this.seriesName = Optional.ofNullable(showDB.getSeriesName());
-        this.banner = Optional.ofNullable(showDB.getBanner());
-        this.overview = Optional.ofNullable(showDB.getOverview());
+    public ShowApi(Show showDB, List<Episode> episodes) {
+        this.seriesId = showDB.getExternalId();
+        this.language = showDB.getLanguage();
+        this.seriesName = showDB.getSeriesName();
+        this.banner = showDB.getBanner();
+        this.overview = showDB.getOverview();
         DateFormat df = new SimpleDateFormat("dd-MM-yyyy");
-        this.firstAired = Optional.ofNullable(df.format(showDB.getFirstAired()));
-        this.network = Optional.ofNullable(showDB.getNetwork());
-        this.imdbId = Optional.ofNullable(showDB.getImdbId());
-        this.zap2itId = Optional.ofNullable(showDB.getZap2itId());
-        this.episodes = episodesDB;
+        this.firstAired = df.format(showDB.getFirstAired());
+        this.network = showDB.getNetwork();
+        this.imdbId = showDB.getImdbId();
+        this.zap2itId = showDB.getZap2itId();
+        this.episodes = episodes == null ? Collections.EMPTY_LIST : episodes.stream().map((e) -> new EpisodeApi(e)).collect(Collectors.toList());
     }
 
     public ShowApi() {
@@ -56,51 +57,51 @@ public class ShowApi {
 
     @JsonProperty
     public long getSeriesId() {
-        return seriesId.orElse(0L);
+        return seriesId;
     }
 
     @JsonProperty
     public String getLanguage() {
-        return language.orElse("");
+        return language;
     }
 
     @JsonProperty
     public String getSeriesName() {
-        return seriesName.orElse("");
+        return seriesName;
     }
 
     @JsonProperty
     public String getBanner() {
-        return banner.orElse("");
+        return banner;
     }
 
     @JsonProperty
     public String getOverview() {
-        return overview.orElse("");
+        return overview;
     }
 
     @JsonProperty
     public String getFirstAired() {
-        return firstAired.orElse("");
+        return firstAired;
     }
 
     @JsonProperty
     public String getNetwork() {
-        return network.orElse("");
+        return network;
     }
 
     @JsonProperty
     public String getImdbId() {
-        return imdbId.orElse("");
+        return imdbId;
     }
 
     @JsonProperty
     public String getZap2itId() {
-        return zap2itId.orElse("");
+        return zap2itId;
     }
 
     @JsonProperty
-    public List<Episode> getEpisodes() {
+    public List<EpisodeApi> getEpisodes() {
         return episodes;
     }
 }
